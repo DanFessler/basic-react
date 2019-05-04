@@ -3,37 +3,103 @@ import "./App.css";
 import Plugin from "./plugins/testPlugin.js";
 import basic from "jsbasic";
 
-const program = `
-  i:0
-  update
-    fillCanvas("hsla("+(i%360)+",100%,50%,0.1)")
-    i:i+1
-    'drawCircle(getMouseX,getMouseY,50-10*getMouseButton,"hsl("+((i*2)%360)+",100%,50%)")
-    drawGrid(getMouseX,getMouseY, 20, 10, "hsl("+((i*2)%360)+",100%,50%)")
-  endupdate
-
-  function drawGrid(x,y,w,h, color)
-    for thisy:0 to h-1
-      for thisx:0 to w-1
-        s: sin((i+(thisx-w/2)*(thisy-h/2))/5)*5+10
-        drawCircle(x + thisx*40 - (w-1)*40/2, y + thisy*40 - (h-1)*40/2, s, color)
-      next
-    next
-  endfunction
-`;
-
 class App extends Component {
-  componentDidMount() {
-    let plugin = new Plugin("canvas");
-    basic.import(plugin.getFunctions());
-    basic.run(program);
-    this.refs.canvasRef.width = window.innerWidth;
-    this.refs.canvasRef.height = window.innerHeight;
+  state = {
+    program: "poop",
+    playing: true
+  };
+
+  componentWillMount() {
+    fetch("./programs/test.bas")
+      .then(r => r.text())
+      .then(program => {
+        let plugin = new Plugin("canvas");
+        basic.import(plugin.getFunctions());
+        basic.run(program);
+        this.setState({ program: program });
+      });
   }
+
+  handleSourceChange = e => {
+    if (this.state.playing) {
+      this.setState({ playing: false });
+      basic.stop();
+    }
+    this.setState({ program: e.target.value });
+  };
+
+  handlePlay = () => {
+    if (this.state.playing) {
+      this.setState({ playing: false });
+      basic.stop();
+    } else {
+      this.setState({ playing: true });
+      basic.run(this.state.program);
+    }
+  };
+
   render() {
     return (
       <div className="App">
-        <canvas id="canvas" width="1000" height="1000" ref="canvasRef" />
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <canvas
+            id="canvas"
+            width="800"
+            height="600"
+            ref="canvasRef"
+            // style={{ boxShadow: "0 2px 10px black" }}
+          />
+          <div
+            style={{
+              display: "flex",
+              // justifyContent: "flex-end",
+              color: "#ccc",
+              margingBottom: 1,
+              backgroundColor: "#222"
+            }}
+          >
+            <div style={{ padding: 8 }}>Main.bas</div>
+            <div style={{ flexGrow: 1 }} />
+            <button
+              value={this.state.playing ? "Stop" : "Play"}
+              onClick={this.handlePlay}
+              style={{
+                display: "block",
+                padding: 8,
+                border: 0,
+                backgroundColor: "transparent",
+                borderLeft: "1px solid #1a1a1a",
+                cursor: "pointer",
+                color: "inherit"
+              }}
+            >
+              {this.state.playing ? "Stop" : "Play"}
+            </button>
+          </div>
+          <div style={{ width: 800, flexGrow: 1 }}>
+            <textarea
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
+              style={{
+                boxSizing: "border-box",
+                width: "100%",
+                height: "100%",
+                resize: "none",
+                display: "block",
+                padding: 10,
+                margin: 0,
+                border: 0,
+                backgroundColor: "#1a1a1a",
+                fontFamily: "monospace",
+                color: "#aaa"
+              }}
+              value={this.state.program}
+              onChange={this.handleSourceChange}
+            />
+          </div>
+        </div>
       </div>
     );
   }
