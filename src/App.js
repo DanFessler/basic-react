@@ -10,7 +10,7 @@ import { PlayIcon, StopIcon } from "./icons";
 class App extends Component {
   state = {
     program: "poop",
-    playing: true,
+    playing: false,
     test: true,
     panelWidths: [{ size: 480, minSize: 320, resize: "dynamic" }]
   };
@@ -22,8 +22,8 @@ class App extends Component {
         let plugin = new testPlugin("canvas");
         basic.import(plugin.getFunctions());
         basic.import(mathPlugin);
-        basic.run(program);
         this.setState({ program: program });
+        this.handlePlay();
       });
   }
 

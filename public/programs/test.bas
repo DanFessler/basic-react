@@ -6,11 +6,13 @@ y:getMouseY
 while 1
   fillCanvas("hsla("+((time/100)%360)+",100%,33%,0.1)")
 
-  x: lerp(x, getMouseX, 0.1)
-  y: lerp(y, getMouseY, 0.1)
+  d: deltaTime
+  x: lerp(x, getMouseX, 0.005*d )
+  y: lerp(y, getMouseY, 0.005*d )
 
-  drawCircleGrid(x,y, 3, 3, time/100)
-
+  drawCircleGrid(x,y, 4, 4, time/100)
+  
+  'print ("FPS: "+1000/d)
   update
 wend
 
