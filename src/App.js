@@ -2,14 +2,19 @@ import React, { Component } from "react";
 import "./App.css";
 import Plugin from "./plugins/testPlugin.js";
 import basic from "jsbasic";
+import { withContentRect } from "react-measure";
+import PanelGroup from "react-panelgroup";
+import { PlayIcon, StopIcon } from "./icons";
 
 class App extends Component {
   state = {
     program: "poop",
-    playing: true
+    playing: true,
+    test: true,
+    panelWidths: [{ size: 800, minSize: 320, resize: "dynamic" }]
   };
 
-  componentWillMount() {
+  componentDidMount() {
     fetch("./programs/test.bas")
       .then(r => r.text())
       .then(program => {
@@ -41,48 +46,54 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <canvas
-            id="canvas"
-            width="800"
-            height="600"
-            ref="canvasRef"
-            // style={{ boxShadow: "0 2px 10px black" }}
-          />
-          <div
-            style={{
-              display: "flex",
-              // justifyContent: "flex-end",
-              color: "#ccc",
-              margingBottom: 1,
-              backgroundColor: "#222"
-            }}
-          >
-            <div style={{ padding: 8 }}>Main.bas</div>
-            <div style={{ flexGrow: 1 }} />
-            <button
-              value={this.state.playing ? "Stop" : "Play"}
-              onClick={this.handlePlay}
+        <PanelGroup
+          panelWidths={this.state.panelWidths}
+          onUpdate={panels => this.setState({ panelWidths: panels })}
+        >
+          <div style={{ flexGrow: 1 }}>
+            <div
               style={{
-                display: "block",
-                padding: 8,
-                border: 0,
-                backgroundColor: "transparent",
-                borderLeft: "1px solid #1a1a1a",
-                cursor: "pointer",
-                color: "inherit"
+                display: "flex",
+                flexGrow: 1,
+                // justifyContent: "flex-end",
+                color: "#ccc",
+                margingBottom: 1,
+                backgroundColor: "#222",
+                height: 40
               }}
             >
-              {this.state.playing ? "Stop" : "Play"}
-            </button>
-          </div>
-          <div style={{ width: 800, flexGrow: 1 }}>
+              <div style={{ padding: 8 }}>Basic.js</div>
+              <div style={{ flexGrow: 1 }} />
+              <div
+                value={this.state.playing ? "Stop" : "Play"}
+                onClick={this.handlePlay}
+                style={{
+                  width: 40,
+                  border: 0,
+                  backgroundColor: "transparent",
+                  borderLeft: "1px solid #1a1a1a",
+                  cursor: "pointer",
+                  color: "inherit",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                {this.state.playing ? (
+                  <StopIcon style={{ fill: "#bbb", height: 14 }} />
+                ) : (
+                  <PlayIcon style={{ fill: "#bbb", height: 16 }} />
+                )}
+              </div>
+            </div>
             <textarea
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="off"
               spellCheck="false"
+              cols="1000"
               style={{
+                display: "block",
                 boxSizing: "border-box",
                 width: "100%",
                 height: "100%",
@@ -99,10 +110,29 @@ class App extends Component {
               onChange={this.handleSourceChange}
             />
           </div>
-        </div>
+          <Canvas />
+        </PanelGroup>
       </div>
     );
   }
 }
+
+const Canvas = withContentRect("bounds")(
+  ({ measureRef, measure, contentRect }) => {
+    return (
+      <canvas
+        id="canvas"
+        width={contentRect.bounds.width}
+        height={contentRect.bounds.height}
+        ref={measureRef}
+        style={{
+          display: "block",
+          width: "100%"
+          // backgroundColor: "blue"
+        }}
+      />
+    );
+  }
+);
 
 export default App;

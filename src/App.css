@@ -36,9 +36,16 @@
     transform: rotate(360deg);
   }
 }
-
+textarea {
+  font-size: 14px;
+}
 textarea:focus {
   box-shadow: none !important;
   border: none !important;
   outline: none !important;
+}
+
+.canvasContainer {
+  overflow: hidden;
+  transition: 0.2s height ease-in-out;
 }
