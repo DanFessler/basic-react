@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "./App.css";
-import Plugin from "./plugins/testPlugin.js";
+import testPlugin from "./plugins/testPlugin.js";
+import mathPlugin from "./plugins/mathPlugin.js";
 import basic from "jsbasic";
 import { withContentRect } from "react-measure";
 import PanelGroup from "react-panelgroup";
@@ -11,15 +12,16 @@ class App extends Component {
     program: "poop",
     playing: true,
     test: true,
-    panelWidths: [{ size: 800, minSize: 320, resize: "dynamic" }]
+    panelWidths: [{ size: 480, minSize: 320, resize: "dynamic" }]
   };
 
   componentDidMount() {
     fetch("./programs/test.bas")
       .then(r => r.text())
       .then(program => {
-        let plugin = new Plugin("canvas");
+        let plugin = new testPlugin("canvas");
         basic.import(plugin.getFunctions());
+        basic.import(mathPlugin);
         basic.run(program);
         this.setState({ program: program });
       });
@@ -93,7 +95,6 @@ class App extends Component {
               spellCheck="false"
               cols="1000"
               style={{
-                display: "block",
                 boxSizing: "border-box",
                 width: "100%",
                 height: "100%",

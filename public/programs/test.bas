@@ -1,10 +1,22 @@
 suspendupdate
 
+x:getMouseX
+y:getMouseY
+
 while 1
   fillCanvas("hsla("+((time/100)%360)+",100%,33%,0.1)")
-  drawCircleGrid(getMouseX,getMouseY, 6, 6, time/100)
+
+  x: lerp(x, getMouseX, 0.1)
+  y: lerp(y, getMouseY, 0.1)
+
+  drawCircleGrid(x,y, 3, 3, time/100)
+
   update
 wend
+
+function lerp(a,b,smooth)
+  return a+ (b-a)*smooth
+endfunction
 
 function drawCircleGrid(x,y,w,h, i)
   for thisy:0 to h-1
